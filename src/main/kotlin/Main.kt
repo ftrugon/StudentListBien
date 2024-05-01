@@ -23,9 +23,9 @@ import androidx.compose.ui.window.rememberWindowState
 
 @Composable
 @Preview
-fun App() {
-    var text by remember { mutableStateOf("Hello, World!") }
-
+fun App(
+    alumnos: IGestorAlumnos
+) {
     Column(
         modifier = Modifier.fillMaxSize(),
         verticalArrangement = Arrangement.Center,
@@ -64,7 +64,7 @@ fun App() {
                 ){
                 }
                 Button(
-                    onClick = {}
+                    onClick = {alumnos.borrarTodo()}
                 ){
                     Text("Borrar todo")
                 }
@@ -81,19 +81,6 @@ fun App() {
 
 }
 
-@Composable
-fun TextBox2(text: String = "Item") {
-    Box(
-        modifier = Modifier.height(32.dp)
-            .fillMaxWidth()
-            .background(color = Color(0, 0, 0, 20))
-            .padding(start = 10.dp),
-        contentAlignment = Alignment.CenterStart
-    ) {
-        Text(text = text)
-    }
-}
-
 fun main() = application {
 
     val windowState = rememberWindowState(height = 600.dp, width = 800.dp)
@@ -104,4 +91,6 @@ fun main() = application {
     ) {
         App()
     }
+
+
 }
