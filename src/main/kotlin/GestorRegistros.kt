@@ -1,8 +1,8 @@
 import java.io.File
 
-class GestorRegistros():IGestorDatos {
+class GestorRegistros:IGestorDatos {
 
-    private val archivo = File(System.getProperty("user.dir") + "/alumnos.txt")
+    private val archivo = File("alumnos.txt")
 
     init {
         if (!existeFich()){
