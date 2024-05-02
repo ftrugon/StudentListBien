@@ -1,8 +1,8 @@
 import androidx.compose.desktop.ui.tooling.preview.Preview
-import androidx.compose.foundation.background
-import androidx.compose.foundation.border
+import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -83,7 +83,6 @@ fun App(
                 },
                 foco
             )
-
         }
 
         compBoton("Guardar Cambios") {
@@ -91,7 +90,6 @@ fun App(
             foco.requestFocus()
             mostrarGuardarCambios = true
         }
-
 
         if (mostrarGuardarCambios){
             Toast("SE ESTAN GUARDANDO LOS CAMBIOS"){
@@ -123,23 +121,22 @@ fun columnaAnadirAlumno(nuevoAlumno:String,cambiarValor:(String)->Unit,onClicAna
 }
 
 @Composable
-fun mostrarAlumnos(visualDeAlumnos:MutableList<String>,lambdaTexto:(String) -> Unit,onClicEliminarTo:()-> Unit,foco:FocusRequester){
+fun mostrarAlumnos(visualDeAlumnos:MutableList<String>,lambdaTexto:(Int) -> Unit,onClicEliminarTo:()-> Unit,foco:FocusRequester){
     Column(
         verticalArrangement = Arrangement.spacedBy(10.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ){
+        Text("Alumnos: ${visualDeAlumnos.size}")
         LazyColumn(
             modifier = Modifier
                 .size(width = 250.dp, height = 350.dp)
                 .background(color = Color.LightGray, shape = RoundedCornerShape(10.dp))
-
-        ){
+        ) {
             itemsIndexed(visualDeAlumnos) { index, alumno ->
-                TextBox(alumno,foco) {
-                     lambdaTexto(alumno)
+                TextBox(alumno, foco) {
+                    lambdaTexto(index)
                 }
             }
-
         }
 
         compBoton("Borrar Todo") {

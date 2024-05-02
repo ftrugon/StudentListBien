@@ -10,9 +10,8 @@ class GestorAlumnos(
         alumnos.add(alumnoAAnadir)
     }
 
-    override fun eliminarDeLista(alumnoAeliminar: String){
-        val alumnoLowerCase = alumnoAeliminar.lowercase()
-        alumnos = alumnos.filter { it.lowercase() != alumnoLowerCase }.toMutableList()
+    override fun eliminarDeLista(indexAlumnoAeliminar: Int){
+        alumnos.removeAt(indexAlumnoAeliminar)
     }
 
     override fun borrarTodo(){

@@ -1,7 +1,7 @@
 interface IGestorAlumnos {
     fun anadirALista(alumnoAAnadir: String)
 
-    fun eliminarDeLista(alumnoAeliminar: String)
+    fun eliminarDeLista(indexAlumnoAeliminar: Int)
 
     fun borrarTodo()
 
