@@ -86,7 +86,6 @@ fun App(
 
         }
 
-
         compBoton("Guardar Cambios") {
             alumnos.escribirArchivo()
             foco.requestFocus()

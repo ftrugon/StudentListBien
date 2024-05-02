@@ -19,7 +19,7 @@ class GestorRegistros:IGestorDatos {
     }
 
     override fun recogerAlumnos():List<String>{
-        return archivo.useLines { it.toList() }
+        return archivo.readLines()
     }
 
     override fun guardarAlumnos(alumnos: List<String>){
