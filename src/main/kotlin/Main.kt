@@ -3,29 +3,45 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.application
 import androidx.compose.ui.window.rememberWindowState
+import kotlinx.coroutines.delay
 
 @Composable
 @Preview
 fun App(
     alumnos: IGestorAlumnos
 ) {
+
+    var visualDeAlumnos by remember { mutableStateOf(alumnos.getAlumnos()) }
+
+    var nuevoAlumno by remember { mutableStateOf("") }
+
+    val foco = remember { FocusRequester() }
+
     Column(
         modifier = Modifier.fillMaxSize(),
         verticalArrangement = Arrangement.Center,
@@ -36,52 +52,159 @@ fun App(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceAround
         ){
-            Column(
-                verticalArrangement = Arrangement.spacedBy(10.dp),
-                horizontalAlignment = Alignment.CenterHorizontally
-            ){
-                OutlinedTextField(
-                    value = "",
-                    label = { Text("Alumno") },
-                    onValueChange = {},
-                )
-                Button(
-                    onClick = {}
-                ){
-                    Text("Añadir alumno")
-                }
-            }
 
-            Column(
-                verticalArrangement = Arrangement.spacedBy(10.dp),
-                horizontalAlignment = Alignment.CenterHorizontally
-            ){
-                LazyColumn(
-                    modifier = Modifier
-                        .size(width = 250.dp, height = 350.dp)
-                        .border(width = 1.dp, color =  Color.Black)
+            columnaAnadirAlumno(
+                nuevoAlumno = nuevoAlumno,
+                cambiarValor = {nuevoAlumno = it},
+                onClicAnadir = {
+                    if (nuevoAlumno.trim().isNotEmpty()) {
+                        alumnos.anadirALista(nuevoAlumno.trimEnd().trimStart())
+                        nuevoAlumno = ""
+                        visualDeAlumnos = alumnos.getAlumnos()
+                    }
+                },
+                foco
+            )
 
-                ){
-                }
-                Button(
-                    onClick = {alumnos.borrarTodo()}
-                ){
-                    Text("Borrar todo")
-                }
-            }
+            mostrarAlumnos(
+                visualDeAlumnos = visualDeAlumnos,
+                lambdaTexto = {
+                    alumnos.eliminarDeLista(it)
+                    visualDeAlumnos = alumnos.getAlumnos()
+                },
+                onClicEliminarTo = {
+                    alumnos.borrarTodo()
+                    visualDeAlumnos = alumnos.getAlumnos()
+                },
+                foco
+            )
+
         }
-        
-        Button(
-            onClick = {}
-        ){
-            Text("Guardar Cambios")
-        }
+
+
+        compBoton("Guardar Cambios",{
+            alumnos.escribirArchivo()
+            foco.requestFocus()
+        },true)
 
     }
-
 }
 
+@Composable
+fun columnaAnadirAlumno(nuevoAlumno:String,cambiarValor:(String)->Unit,onClicAnadir:()->Unit,foco:FocusRequester){
+    Column(
+        verticalArrangement = Arrangement.spacedBy(10.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ){
+        OutlinedTextField(
+            value = nuevoAlumno,
+            label = { Text("Alumno") },
+            onValueChange = cambiarValor,
+            singleLine = true,
+            modifier = Modifier.focusRequester(foco)
+
+        )
+
+
+        compBoton("Añadir Alumno",{
+            onClicAnadir()
+        })
+
+    }
+}
+
+@Composable
+fun mostrarAlumnos(visualDeAlumnos:MutableList<String>,lambdaTexto:(String) -> Unit,onClicEliminarTo:()-> Unit,foco:FocusRequester){
+    Column(
+        verticalArrangement = Arrangement.spacedBy(10.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ){
+        LazyColumn(
+            modifier = Modifier
+                .size(width = 250.dp, height = 350.dp)
+                .background(color = Color.LightGray, shape = RoundedCornerShape(10.dp))
+
+        ){
+            itemsIndexed(visualDeAlumnos) { index, alumno ->
+                TextBox(alumno,foco) {
+                     lambdaTexto(alumno)
+                }
+            }
+
+        }
+
+        compBoton("Borrar Todo",{
+            onClicEliminarTo()
+            foco.requestFocus()
+        })
+
+    }
+}
+
+@Composable
+fun TextBox(text: String = "Item",foco:FocusRequester, onDeleteClick: () -> Unit) {
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(50.dp)
+            .background(Color.LightGray, shape = RoundedCornerShape(10.dp))
+            .padding(start = 10.dp)
+    ){
+        Text(text = text)
+        Spacer(modifier = Modifier.weight(1f))
+        IconButton(
+            onClick = {
+                onDeleteClick()
+                foco.requestFocus()
+            }
+        ) {
+            Icon(Icons.Default.Delete, contentDescription = "Eliminar")
+        }
+    }
+}
+
+
+@Composable
+fun compBoton(testito:String,funcionClic:()->Unit,esGuardar:Boolean = false){
+    Button(
+        onClick = {
+            funcionClic()
+            if (esGuardar){
+                Toast("sadas",{})
+            }
+        }
+    ){
+        Text(testito)
+    }
+}
+
+@Composable
+fun Toast(message: String, onDismiss: () -> Unit) {
+    Dialog(
+        title = "Atención",
+        resizable = false,
+        onCloseRequest = onDismiss
+    ) {
+        Box(
+            contentAlignment = Alignment.Center,
+            modifier = Modifier.fillMaxSize().padding(16.dp)
+        ) {
+            Text(message)
+        }
+    }
+    // Cierra el Toast después de 2 segundos
+    LaunchedEffect(Unit) {
+        delay(2000)
+        onDismiss()
+    }
+}
+
+
 fun main() = application {
+
+    val registro = GestorRegistros()
+    val alumnos = GestorAlumnos(registro)
 
     val windowState = rememberWindowState(height = 600.dp, width = 800.dp)
 
@@ -89,7 +212,7 @@ fun main() = application {
         onCloseRequest = ::exitApplication,
         state =  windowState
     ) {
-        App()
+        App(alumnos)
     }
 
 

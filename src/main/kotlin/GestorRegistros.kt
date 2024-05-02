@@ -23,7 +23,15 @@ class GestorRegistros():IGestorDatos {
     }
 
     override fun guardarAlumnos(alumnos: List<String>){
-        alumnos.forEach { archivo.appendText(it) }
+        archivo.writeText("")
+        alumnos.forEach {
+            if (it == alumnos[0]){
+                archivo.appendText(it)
+            }else{
+                archivo.appendText("\n$it")
+            }
+
+        }
     }
 
 }
