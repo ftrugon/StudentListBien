@@ -18,6 +18,7 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.key.onKeyEvent
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
@@ -29,6 +30,7 @@ import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.application
 import androidx.compose.ui.window.rememberWindowState
 import kotlinx.coroutines.delay
+import kotlin.system.exitProcess
 
 @Composable
 @Preview
@@ -41,6 +43,9 @@ fun App(
     var nuevoAlumno by remember { mutableStateOf("") }
 
     val foco = remember { FocusRequester() }
+
+    var mostrarGuardarCambios by remember { mutableStateOf(false) }
+
 
     Column(
         modifier = Modifier.fillMaxSize(),
@@ -82,10 +87,18 @@ fun App(
         }
 
 
-        compBoton("Guardar Cambios",{
+        compBoton("Guardar Cambios") {
             alumnos.escribirArchivo()
             foco.requestFocus()
-        },true)
+            mostrarGuardarCambios = true
+        }
+
+
+        if (mostrarGuardarCambios){
+            Toast("SE ESTAN GUARDANDO LOS CAMBIOS"){
+                mostrarGuardarCambios = false
+            }
+        }
 
     }
 }
@@ -102,13 +115,10 @@ fun columnaAnadirAlumno(nuevoAlumno:String,cambiarValor:(String)->Unit,onClicAna
             onValueChange = cambiarValor,
             singleLine = true,
             modifier = Modifier.focusRequester(foco)
-
         )
-
-
-        compBoton("Añadir Alumno",{
+        compBoton("Añadir Alumno") {
             onClicAnadir()
-        })
+        }
 
     }
 }
@@ -133,10 +143,10 @@ fun mostrarAlumnos(visualDeAlumnos:MutableList<String>,lambdaTexto:(String) -> U
 
         }
 
-        compBoton("Borrar Todo",{
+        compBoton("Borrar Todo") {
             onClicEliminarTo()
             foco.requestFocus()
-        })
+        }
 
     }
 }
@@ -166,13 +176,11 @@ fun TextBox(text: String = "Item",foco:FocusRequester, onDeleteClick: () -> Unit
 
 
 @Composable
-fun compBoton(testito:String,funcionClic:()->Unit,esGuardar:Boolean = false){
+@Preview
+fun compBoton(testito:String,funcionClic:()->Unit){
     Button(
         onClick = {
             funcionClic()
-//            if (esGuardar){
-//                Toast("sadas",{})
-//            }
         }
     ){
         Text(testito)
@@ -180,6 +188,7 @@ fun compBoton(testito:String,funcionClic:()->Unit,esGuardar:Boolean = false){
 }
 
 @Composable
+@Preview
 fun Toast(message: String, onDismiss: () -> Unit) {
     Dialog(
         title = "Atención",
@@ -193,9 +202,9 @@ fun Toast(message: String, onDismiss: () -> Unit) {
             Text(message)
         }
     }
-    // Cierra el Toast después de 2 segundos
+    // Cierra el Toast después de 1 segundos
     LaunchedEffect(Unit) {
-        delay(2000)
+        delay(1000)
         onDismiss()
     }
 }
