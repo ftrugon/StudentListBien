@@ -170,9 +170,9 @@ fun compBoton(testito:String,funcionClic:()->Unit,esGuardar:Boolean = false){
     Button(
         onClick = {
             funcionClic()
-            if (esGuardar){
-                Toast("sadas",{})
-            }
+//            if (esGuardar){
+//                Toast("sadas",{})
+//            }
         }
     ){
         Text(testito)
