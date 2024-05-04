@@ -1,50 +1,49 @@
 import androidx.compose.desktop.ui.tooling.preview.Preview
-import androidx.compose.foundation.background
-import androidx.compose.foundation.border
+import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
-import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.KeyboardActions
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
-import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.key.KeyEventType
+import androidx.compose.ui.input.key.key
 import androidx.compose.ui.input.key.onKeyEvent
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.input.ImeAction
-import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.text.input.PasswordVisualTransformation
-import androidx.compose.ui.text.input.VisualTransformation
+import androidx.compose.ui.input.key.type
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.application
 import androidx.compose.ui.window.rememberWindowState
 import kotlinx.coroutines.delay
-import kotlin.system.exitProcess
+import androidx.compose.ui.input.key.*
 
 @Composable
 @Preview
 fun App(
-    alumnos: IGestorAlumnos
+    registros: IGestorDatos
 ) {
 
-    var visualDeAlumnos by remember { mutableStateOf(alumnos.getAlumnos()) }
+    val alumnos = remember { mutableStateListOf<String>() }
 
     var nuevoAlumno by remember { mutableStateOf("") }
 
     val foco = remember { FocusRequester() }
 
     var mostrarGuardarCambios by remember { mutableStateOf(false) }
+
+
+    LaunchedEffect(key1 = true) {
+        alumnos.addAll(registros.recogerAlumnos())
+    }
 
 
     Column(
@@ -63,35 +62,30 @@ fun App(
                 cambiarValor = {nuevoAlumno = it},
                 onClicAnadir = {
                     if (nuevoAlumno.trim().isNotEmpty()) {
-                        alumnos.anadirALista(nuevoAlumno.trimEnd().trimStart())
+                        alumnos.add(nuevoAlumno.trimStart().trimEnd())
                         nuevoAlumno = ""
-                        visualDeAlumnos = alumnos.getAlumnos()
                     }
                 },
-                foco
+                foco = foco
             )
 
             mostrarAlumnos(
-                visualDeAlumnos = visualDeAlumnos,
+                alumnos = alumnos,
                 lambdaTexto = {
-                    alumnos.eliminarDeLista(it)
-                    visualDeAlumnos = alumnos.getAlumnos()
+                    alumnos.removeAt(it)
                 },
                 onClicEliminarTo = {
-                    alumnos.borrarTodo()
-                    visualDeAlumnos = alumnos.getAlumnos()
+                    alumnos.removeAll(alumnos)
                 },
-                foco
+                foco = foco
             )
-
         }
 
         compBoton("Guardar Cambios") {
-            alumnos.escribirArchivo()
+            registros.guardarAlumnos(alumnos)
             foco.requestFocus()
             mostrarGuardarCambios = true
         }
-
 
         if (mostrarGuardarCambios){
             Toast("SE ESTAN GUARDANDO LOS CAMBIOS"){
@@ -102,11 +96,23 @@ fun App(
     }
 }
 
+@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun columnaAnadirAlumno(nuevoAlumno:String,cambiarValor:(String)->Unit,onClicAnadir:()->Unit,foco:FocusRequester){
     Column(
         verticalArrangement = Arrangement.spacedBy(10.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
+        horizontalAlignment = Alignment.CenterHorizontally,
+        modifier = Modifier
+            .padding(end = 20.dp)
+            .onKeyEvent { event ->
+                if (event.type == KeyEventType.KeyUp && event.key == Key.Enter) {
+                    onClicAnadir()
+                    true // Consumimos el evento
+                } else {
+                    false // No consumimos el evento
+                }
+            }
+
     ){
         OutlinedTextField(
             value = nuevoAlumno,
@@ -123,23 +129,22 @@ fun columnaAnadirAlumno(nuevoAlumno:String,cambiarValor:(String)->Unit,onClicAna
 }
 
 @Composable
-fun mostrarAlumnos(visualDeAlumnos:MutableList<String>,lambdaTexto:(String) -> Unit,onClicEliminarTo:()-> Unit,foco:FocusRequester){
+fun mostrarAlumnos(alumnos:MutableList<String>,lambdaTexto:(Int) -> Unit,onClicEliminarTo:()-> Unit,foco:FocusRequester){
     Column(
         verticalArrangement = Arrangement.spacedBy(10.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ){
+        Text("Alumnos: ${alumnos.size}")
         LazyColumn(
             modifier = Modifier
                 .size(width = 250.dp, height = 350.dp)
                 .background(color = Color.LightGray, shape = RoundedCornerShape(10.dp))
-
-        ){
-            itemsIndexed(visualDeAlumnos) { index, alumno ->
-                TextBox(alumno,foco) {
-                     lambdaTexto(alumno)
+        ) {
+            itemsIndexed(alumnos) { index, alumno ->
+                TextBox(alumno, foco) {
+                    lambdaTexto(index)
                 }
             }
-
         }
 
         compBoton("Borrar Todo") {
@@ -212,7 +217,6 @@ fun Toast(message: String, onDismiss: () -> Unit) {
 fun main() = application {
 
     val registro = GestorRegistros()
-    val alumnos = GestorAlumnos(registro)
 
     val windowState = rememberWindowState(height = 600.dp, width = 800.dp)
 
@@ -220,7 +224,7 @@ fun main() = application {
         onCloseRequest = ::exitApplication,
         state =  windowState
     ) {
-        App(alumnos)
+        App(registro)
     }
 
 
