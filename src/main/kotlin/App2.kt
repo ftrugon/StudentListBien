@@ -16,7 +16,7 @@ import androidx.compose.ui.window.Dialog
 import kotlinx.coroutines.delay
 
 @Composable
-fun App(viewModel: ViewModel) {
+fun App2(viewModel: ViewModel) {
     var mostrarGuardarCambios by remember { mutableStateOf(false) }
 
     Column(

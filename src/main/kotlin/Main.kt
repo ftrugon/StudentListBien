@@ -15,7 +15,7 @@ fun main() = application {
         onCloseRequest = ::exitApplication,
         state =  windowState
     ) {
-        App(alumnos)
+        App2(alumnos)
     }
 
 
