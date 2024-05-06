@@ -12,8 +12,6 @@ import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.window.Dialog
-import kotlinx.coroutines.delay
 
 @Composable
 fun App2(viewModel: ViewModel) {
@@ -36,7 +34,7 @@ fun App2(viewModel: ViewModel) {
             )
 
             mostrarAlumnos(
-                alumnos = viewModel.alumnos,
+                alumnos = viewModel.obtenerAlumnos(),
                 viewModel = viewModel,
                 modifier = Modifier.weight(1f)
             )
@@ -65,9 +63,9 @@ fun columnaAnadirAlumno(viewModel: ViewModel, modifier: Modifier = Modifier) {
         modifier = modifier
     ) {
         OutlinedTextField(
-            value = viewModel.nuevoAlumno,
+            value = viewModel.obtenerNuevoAlumno(),
             label = { Text("Alumno") },
-            onValueChange = { viewModel.nuevoAlumno = it },
+            onValueChange = { viewModel.cambiarNuevoAlumno(it) },
             singleLine = true
         )
         compBoton("Añadir Alumno", viewModel::anadirAlumno)

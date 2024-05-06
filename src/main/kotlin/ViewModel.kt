@@ -7,13 +7,12 @@ class ViewModel(
     private val registros: IGestorDatos
 ):IViewModel {
 
-    override val alumnos = mutableStateListOf<String>()
-    override var nuevoAlumno by mutableStateOf("")
+    private val alumnos = mutableStateListOf<String>()
+    private var nuevoAlumno by mutableStateOf("")
 
     init {
         alumnos.addAll(registros.recogerAlumnos())
     }
-
 
     override fun anadirAlumno() {
         if (nuevoAlumno.trim().isNotEmpty()) {
@@ -33,4 +32,13 @@ class ViewModel(
     override fun eliminarTodos() {
         alumnos.clear()
     }
+
+    override fun obtenerAlumnos() = alumnos
+
+    override fun obtenerNuevoAlumno() = nuevoAlumno
+
+    override fun cambiarNuevoAlumno(nuevoNombre:String){
+        nuevoAlumno = nuevoNombre
+    }
+
 }

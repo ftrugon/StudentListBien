@@ -20,9 +20,6 @@ import androidx.compose.ui.input.key.onKeyEvent
 import androidx.compose.ui.input.key.type
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
-import androidx.compose.ui.window.Window
-import androidx.compose.ui.window.application
-import androidx.compose.ui.window.rememberWindowState
 import kotlinx.coroutines.delay
 import androidx.compose.ui.input.key.*
 
@@ -54,14 +51,14 @@ fun App(
         ){
 
             columnaAnadirAlumno(
-                nuevoAlumno = viewModel.nuevoAlumno,
-                cambiarValor = {viewModel.nuevoAlumno = it},
+                nuevoAlumno = viewModel.obtenerNuevoAlumno(),
+                cambiarValor = {viewModel.cambiarNuevoAlumno(it)},
                 onClicAnadir = { viewModel.anadirAlumno() },
                 foco = foco
             )
 
             mostrarAlumnos(
-                alumnos = viewModel.alumnos,
+                alumnos = viewModel.obtenerAlumnos(),
                 lambdaTexto = {
                     viewModel.eliminarAlumno(it)
                 },

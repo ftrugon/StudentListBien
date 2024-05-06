@@ -13,9 +13,11 @@ fun main() = application {
 
     Window(
         onCloseRequest = ::exitApplication,
-        state =  windowState
+        state =  windowState,
+        resizable = false,
+
     ) {
-        App2(alumnos)
+        App(alumnos)
     }
 
 
