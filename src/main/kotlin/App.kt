@@ -1,3 +1,5 @@
+@file:OptIn(ExperimentalFoundationApi::class)
+
 import androidx.compose.desktop.ui.tooling.preview.Preview
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
@@ -22,6 +24,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import kotlinx.coroutines.delay
 import androidx.compose.ui.input.key.*
+import androidx.compose.ui.input.pointer.PointerEventType
+import androidx.compose.ui.input.pointer.onPointerEvent
+import androidx.compose.foundation.combinedClickable
 
 @Composable
 @Preview
@@ -109,9 +114,9 @@ fun columnaAnadirAlumno(nuevoAlumno:String,cambiarValor:(String)->Unit,onClicAna
             singleLine = true,
             modifier = Modifier.focusRequester(foco)
         )
-        compBoton("Añadir Alumno",{
+        compBoton("Añadir Alumno") {
             onClicAnadir()
-        },Modifier.focusRequester(foco))
+        }
 
     }
 }
@@ -143,17 +148,29 @@ fun mostrarAlumnos(alumnos:MutableList<String>,lambdaTexto:(Int) -> Unit,onClicE
     }
 }
 
+@OptIn(ExperimentalComposeUiApi::class, ExperimentalFoundationApi::class)
 @Composable
 fun TextBox(text: String = "Item",foco:FocusRequester, onDeleteClick: () -> Unit) {
+    var active by remember { mutableStateOf(false) }
+
     Row(
         verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier
             .fillMaxWidth()
             .height(50.dp)
-            .background(Color.LightGray, shape = RoundedCornerShape(10.dp))
-            .padding(start = 10.dp)
+            .background(color = if (active) (Color.Gray) else Color.LightGray, shape = RoundedCornerShape(10.dp))
+            .onPointerEvent(PointerEventType.Enter){active = true}
+            .onPointerEvent(PointerEventType.Exit){active = false}
+            .combinedClickable(
+                onClick = {
+
+                }
+            )
     ){
-        Text(text = text)
+        Text(
+            modifier = Modifier.padding(start = 10.dp),
+            text = text
+        )
         Spacer(modifier = Modifier.weight(1f))
         IconButton(
             onClick = {
@@ -166,6 +183,23 @@ fun TextBox(text: String = "Item",foco:FocusRequester, onDeleteClick: () -> Unit
     }
 }
 
+
+@Composable
+fun pestanaCambiarNombre(cambioDeNombre: ()-> Unit,quitarDialog:()->Unit){
+    Dialog(
+        title = "Cambio de nombre",
+        resizable = false,
+        onCloseRequest = quitarDialog
+    ) {
+        Column(
+            modifier = Modifier.fillMaxSize().padding(16.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Text("CAMBIO DE NOMBRE DEL USUARIO")
+        }
+    }
+
+}
 
 @Composable
 @Preview
