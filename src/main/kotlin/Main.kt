@@ -209,7 +209,7 @@ fun Toast(message: String, onDismiss: () -> Unit) {
 fun main() = application {
 
     val registro = GestorRegistros()
-    val alumnos = GestorAl
+    val alumnos = GestorAlumnos(registro)
 
     val windowState = rememberWindowState(height = 600.dp, width = 800.dp)
 
