@@ -1,0 +1,3 @@
+class StudentRepo:IStudentRepo   {
+
+}
