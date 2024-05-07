@@ -72,7 +72,7 @@ fun App(
                 onClicEliminarTo = {
                     viewModel.eliminarTodos()
                 },
-                onCambiarNombre = {index , nuevoNombre ->
+                onCambiarNombre = {index , nuevoNombre->
                     viewModel.cambiarNombreAlumno(index , nuevoNombre)}
 
             )
@@ -244,14 +244,12 @@ fun pestanaCambiarNombre(
     }
 }
 
+
 @Composable
-@Preview
-fun compBoton(testito:String,funcionClic:()->Unit,modifier: Modifier = Modifier){
+fun compBoton(testito: String, funcionClic: () -> Unit) {
     Button(
-        onClick = {
-            funcionClic()
-        }
-    ){
+        onClick = funcionClic
+    ) {
         Text(testito)
     }
 }
