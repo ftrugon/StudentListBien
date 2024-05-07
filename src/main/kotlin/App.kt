@@ -181,12 +181,12 @@ fun TextBox(alumno: String = "Item",foco:FocusRequester, onDeleteClick: () -> Un
             .onPointerEvent(PointerEventType.Exit){active = false}
             .combinedClickable(
                 onClick = {
+                 //   cambiarNombre = true
+                },
+                onDoubleClick = {
                     cambiarNombre = true
                 }
             )
-            .pointerInput(Unit){
-
-            }
     ){
         Text(
             modifier = Modifier.padding(start = 10.dp),
