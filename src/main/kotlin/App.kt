@@ -27,6 +27,7 @@ import androidx.compose.ui.input.key.*
 import androidx.compose.ui.input.pointer.PointerEventType
 import androidx.compose.ui.input.pointer.onPointerEvent
 import androidx.compose.foundation.combinedClickable
+import androidx.compose.ui.input.pointer.pointerInput
 
 @Composable
 @Preview
@@ -64,13 +65,16 @@ fun App(
 
             mostrarAlumnos(
                 alumnos = viewModel.obtenerAlumnos(),
+                foco = foco,
                 lambdaTexto = {
                     viewModel.eliminarAlumno(it)
                 },
                 onClicEliminarTo = {
                     viewModel.eliminarTodos()
                 },
-                foco = foco
+                onCambiarNombre = {index , nuevoNombre ->
+                    viewModel.cambiarNombreAlumno(index , nuevoNombre)}
+
             )
         }
 
@@ -116,13 +120,20 @@ fun columnaAnadirAlumno(nuevoAlumno:String,cambiarValor:(String)->Unit,onClicAna
         )
         compBoton("Añadir Alumno") {
             onClicAnadir()
+            foco.requestFocus()
         }
 
     }
 }
 
 @Composable
-fun mostrarAlumnos(alumnos:MutableList<String>,lambdaTexto:(Int) -> Unit,onClicEliminarTo:()-> Unit,foco:FocusRequester){
+fun mostrarAlumnos(
+    alumnos:MutableList<String>,
+    foco:FocusRequester,
+    lambdaTexto:(Int) -> Unit,
+    onClicEliminarTo:()-> Unit,
+    onCambiarNombre: (Int,String) -> Unit
+){
     Column(
         verticalArrangement = Arrangement.spacedBy(10.dp),
         horizontalAlignment = Alignment.CenterHorizontally
@@ -134,9 +145,12 @@ fun mostrarAlumnos(alumnos:MutableList<String>,lambdaTexto:(Int) -> Unit,onClicE
                 .background(color = Color.LightGray, shape = RoundedCornerShape(10.dp))
         ) {
             itemsIndexed(alumnos) { index, alumno ->
-                TextBox(alumno, foco) {
-                    lambdaTexto(index)
-                }
+                TextBox(
+                    alumno = alumno,
+                    foco = foco,
+                    onDeleteClick = {lambdaTexto(index)},
+                    onCambioNombre = {onCambiarNombre(index,it)}
+                )
             }
         }
 
@@ -145,13 +159,17 @@ fun mostrarAlumnos(alumnos:MutableList<String>,lambdaTexto:(Int) -> Unit,onClicE
             foco.requestFocus()
         }
 
+
     }
 }
 
 @OptIn(ExperimentalComposeUiApi::class, ExperimentalFoundationApi::class)
 @Composable
-fun TextBox(text: String = "Item",foco:FocusRequester, onDeleteClick: () -> Unit) {
+fun TextBox(alumno: String = "Item",foco:FocusRequester, onDeleteClick: () -> Unit,onCambioNombre:(String)->Unit) {
+
     var active by remember { mutableStateOf(false) }
+
+    var cambiarNombre by remember { mutableStateOf(false) }
 
     Row(
         verticalAlignment = Alignment.CenterVertically,
@@ -163,13 +181,16 @@ fun TextBox(text: String = "Item",foco:FocusRequester, onDeleteClick: () -> Unit
             .onPointerEvent(PointerEventType.Exit){active = false}
             .combinedClickable(
                 onClick = {
-
+                    cambiarNombre = true
                 }
             )
+            .pointerInput(Unit){
+
+            }
     ){
         Text(
             modifier = Modifier.padding(start = 10.dp),
-            text = text
+            text = alumno
         )
         Spacer(modifier = Modifier.weight(1f))
         IconButton(
@@ -181,11 +202,22 @@ fun TextBox(text: String = "Item",foco:FocusRequester, onDeleteClick: () -> Unit
             Icon(Icons.Default.Delete, contentDescription = "Eliminar")
         }
     }
+
+    if (cambiarNombre){
+        pestanaCambiarNombre(alumno,{onCambioNombre(it)},{cambiarNombre = false})
+    }
+
 }
 
 
 @Composable
-fun pestanaCambiarNombre(cambioDeNombre: ()-> Unit,quitarDialog:()->Unit){
+fun pestanaCambiarNombre(
+    alumno: String,
+    cambioDeNombre: (String) -> Unit,
+    quitarDialog: () -> Unit
+) {
+    var nuevoNombre by remember { mutableStateOf(alumno) }
+
     Dialog(
         title = "Cambio de nombre",
         resizable = false,
@@ -195,10 +227,21 @@ fun pestanaCambiarNombre(cambioDeNombre: ()-> Unit,quitarDialog:()->Unit){
             modifier = Modifier.fillMaxSize().padding(16.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Text("CAMBIO DE NOMBRE DEL USUARIO")
+            // Campo de texto para ingresar el nuevo nombre
+            OutlinedTextField(
+                value = nuevoNombre,
+                onValueChange = { nuevoNombre = it },
+                label = { Text("Nuevo nombre") },
+                modifier = Modifier.fillMaxWidth()
+            )
+
+            // Botón para confirmar el cambio de nombre
+            compBoton("Confirmar cambio") {
+                cambioDeNombre(nuevoNombre)
+                quitarDialog()
+            }
         }
     }
-
 }
 
 @Composable

@@ -7,6 +7,7 @@ interface IViewModel {
     fun guardarCambios()
     fun eliminarAlumno(index: Int)
     fun eliminarTodos()
+    fun cambiarNombreAlumno(index: Int,nuevoNombre: String)
 
     fun obtenerAlumnos():MutableList<String>
 

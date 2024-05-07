@@ -33,6 +33,10 @@ class ViewModel(
         alumnos.clear()
     }
 
+    override fun cambiarNombreAlumno(index: Int, nuevoNombre: String){
+        alumnos[index] = nuevoNombre
+    }
+
     override fun obtenerAlumnos() = alumnos
 
     override fun obtenerNuevoAlumno() = nuevoAlumno
