@@ -210,6 +210,7 @@ fun TextBox(alumno: String = "Item",foco:FocusRequester, onDeleteClick: () -> Un
 }
 
 
+@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun pestanaCambiarNombre(
     alumno: String,
@@ -221,18 +222,28 @@ fun pestanaCambiarNombre(
     Dialog(
         title = "Cambio de nombre",
         resizable = false,
-        onCloseRequest = quitarDialog
+        onCloseRequest = quitarDialog,
     ) {
         Column(
-            modifier = Modifier.fillMaxSize().padding(16.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
+            modifier = Modifier.fillMaxSize().padding(16.dp)
+                .onKeyEvent { event ->
+                if (event.type == KeyEventType.KeyUp && event.key == Key.Enter) {
+                    cambioDeNombre(nuevoNombre)
+                    quitarDialog()
+                    true // Consumimos el evento
+                } else {
+                    false // No consumimos el evento
+                }
+            },
+            horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             // Campo de texto para ingresar el nuevo nombre
             OutlinedTextField(
                 value = nuevoNombre,
                 onValueChange = { nuevoNombre = it },
                 label = { Text("Nuevo nombre") },
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth(),
+                singleLine = true
             )
 
             // Botón para confirmar el cambio de nombre
