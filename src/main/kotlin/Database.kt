@@ -8,6 +8,7 @@ object Database {
     private const val URL = "jdbc:mysql://localhost:3306/studentdb"
     private const val USER = "studentuser"
     private const val PASSWORD = "password"
+
     init {
         try {
             // Asegurarse de que el driver JDBC de MySQL esté disponible
