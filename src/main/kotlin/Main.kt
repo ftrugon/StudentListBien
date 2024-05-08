@@ -1,3 +1,5 @@
+import ViewModelBd.StudentRepo
+import ViewModelBd.ViewModelDb
 import ViewModelFichero.GestorRegistros
 import ViewModelFichero.ViewModel
 import androidx.compose.ui.unit.dp
@@ -9,7 +11,9 @@ fun main() = application {
 
     val registro = GestorRegistros()
 
-    val alumnos = ViewModel(registro)
+    val gestorRepo = StudentRepo()
+
+    val alumnos = ViewModelDb(gestorRepo)
 
     val windowState = rememberWindowState(height = 600.dp, width = 800.dp)
 
