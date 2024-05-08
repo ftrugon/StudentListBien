@@ -1,6 +1,9 @@
+package ViewModelFichero
+
+import interfaces.IGestorDatos
 import java.io.File
 
-class GestorRegistros:IGestorDatos {
+class GestorRegistros: IGestorDatos {
 
     private val archivo = File("alumnos.txt")
 

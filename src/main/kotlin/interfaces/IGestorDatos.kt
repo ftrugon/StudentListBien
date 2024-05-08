@@ -1,3 +1,5 @@
+package interfaces
+
 interface IGestorDatos {
 
     fun recogerAlumnos():List<String>

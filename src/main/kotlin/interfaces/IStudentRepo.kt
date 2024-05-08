@@ -1,2 +1,4 @@
+package interfaces
+
 interface IStudentRepo {
 }

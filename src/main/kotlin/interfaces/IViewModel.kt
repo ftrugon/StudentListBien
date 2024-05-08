@@ -1,3 +1,5 @@
+package interfaces
+
 interface IViewModel {
 
     //val alumnos:MutableList<String>

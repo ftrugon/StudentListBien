@@ -1,4 +1,8 @@
-class ViewModelDb:IViewModel {
+package ViewModelBd
+
+import interfaces.IViewModel
+
+class ViewModelDb: IViewModel {
     override fun anadirAlumno() {
         TODO("Not yet implemented")
     }

@@ -27,7 +27,7 @@ import androidx.compose.ui.input.key.*
 import androidx.compose.ui.input.pointer.PointerEventType
 import androidx.compose.ui.input.pointer.onPointerEvent
 import androidx.compose.foundation.combinedClickable
-import androidx.compose.ui.input.pointer.pointerInput
+import interfaces.IViewModel
 
 @Composable
 @Preview
@@ -237,7 +237,6 @@ fun pestanaCambiarNombre(
             },
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
-            // Campo de texto para ingresar el nuevo nombre
             OutlinedTextField(
                 value = nuevoNombre,
                 onValueChange = { nuevoNombre = it },
@@ -246,7 +245,6 @@ fun pestanaCambiarNombre(
                 singleLine = true
             )
 
-            // Botón para confirmar el cambio de nombre
             compBoton("Confirmar cambio") {
                 cambioDeNombre(nuevoNombre)
                 quitarDialog()
