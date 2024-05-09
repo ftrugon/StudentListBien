@@ -35,10 +35,10 @@ import kotlin.system.exitProcess
 @Composable
 @Preview
 fun App(
-    alumnos: IGestorAlumnos
+    fileManag: IGestorDatos
 ) {
 
-    var visualDeAlumnos by remember { mutableStateOf(alumnos.getAlumnos()) }
+    val visualDeAlumnos = remember { mutableStateListOf<String>() }
 
     var nuevoAlumno by remember { mutableStateOf("") }
 
@@ -46,6 +46,16 @@ fun App(
 
     var mostrarGuardarCambios by remember { mutableStateOf(false) }
 
+    LaunchedEffect(key1 = true) {
+
+        /*val listaAlumnos = fileManag.recogerAlumnos()
+        visualDeAlumnos.clear()
+        for (alumno in listaAlumnos) {
+            visualDeAlumnos.add(alumno)
+        }*/
+
+        visualDeAlumnos.addAll(fileManag.recogerAlumnos())
+    }
 
     Column(
         modifier = Modifier.fillMaxSize(),
@@ -63,9 +73,8 @@ fun App(
                 cambiarValor = {nuevoAlumno = it},
                 onClicAnadir = {
                     if (nuevoAlumno.trim().isNotEmpty()) {
-                        alumnos.anadirALista(nuevoAlumno.trimEnd().trimStart())
+                        visualDeAlumnos.add(nuevoAlumno.trimEnd().trimStart())
                         nuevoAlumno = ""
-                        visualDeAlumnos = alumnos.getAlumnos()
                     }
                 },
                 foco
@@ -74,19 +83,17 @@ fun App(
             mostrarAlumnos(
                 visualDeAlumnos = visualDeAlumnos,
                 lambdaTexto = {
-                    alumnos.eliminarDeLista(it)
-                    visualDeAlumnos = alumnos.getAlumnos()
+                    visualDeAlumnos.removeAt(it)
                 },
                 onClicEliminarTo = {
-                    alumnos.borrarTodo()
-                    visualDeAlumnos = alumnos.getAlumnos()
+                    visualDeAlumnos.clear()
                 },
                 foco
             )
         }
 
         compBoton("Guardar Cambios") {
-            alumnos.escribirArchivo()
+            fileManag.guardarAlumnos(visualDeAlumnos)
             foco.requestFocus()
             mostrarGuardarCambios = true
         }
@@ -208,8 +215,7 @@ fun Toast(message: String, onDismiss: () -> Unit) {
 
 fun main() = application {
 
-    val registro = GestorRegistros()
-    val alumnos = GestorAlumnos(registro)
+    val fileManag = GestorRegistros()
 
     val windowState = rememberWindowState(height = 600.dp, width = 800.dp)
 
@@ -217,7 +223,7 @@ fun main() = application {
         onCloseRequest = ::exitApplication,
         state =  windowState
     ) {
-        App(alumnos)
+        App(fileManag)
     }
 
 
